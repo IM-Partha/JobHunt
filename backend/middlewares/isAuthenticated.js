@@ -11,7 +11,7 @@ const isAuthenticated = (req, res, next) => {
       });
     }
 
-    const decoded = jwt.verify(token, process.env.SECRET_KEY); // ✅ No await needed
+    const decoded = jwt.verify(token, process.env.SECRET_KEY); 
 
     if (!decoded) {
       return res.status(401).json({
@@ -20,7 +20,7 @@ const isAuthenticated = (req, res, next) => {
       });
     }
 
-    req.id = decoded.userId; // ✅ Attach user ID to request
+    req.id = decoded.userId; 
     next();
   } catch (error) {
     console.error(error);

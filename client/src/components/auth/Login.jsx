@@ -31,16 +31,16 @@ const Login = () => {
 
     try {
       dispatch(setLoading(true));
-      
+
       const res = await axios.post(`${Apiurl}/login`, info, {
         headers: {
           "Content-Type": "application/json",
         },
-         withCredentials: true,
+        withCredentials: true,
       });
 
       if (res.data.success) {
-        dispatch(setAuthUser(res.data.user))
+        dispatch(setAuthUser(res.data.user));
         navigate("/");
         toast.success(res.data.message);
       }
@@ -94,7 +94,6 @@ const Login = () => {
         <div className="mb-4 flex items-center gap-6">
           <div className="flex items-center gap-2">
             <input
-              onChange={HandelChange}
               type="radio"
               id="student"
               name="role"
@@ -102,8 +101,8 @@ const Login = () => {
               checked={info.role === "student"}
               onChange={HandelChange}
               className="cursor-pointer"
-              defaultChecked
             />
+
             <Label htmlFor="student">Student</Label>
           </div>
 
