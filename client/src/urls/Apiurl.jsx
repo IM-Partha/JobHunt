@@ -1,6 +1,6 @@
 
-const main = "http://localhost:3000/api"
-// const main = "https://jobhunt-api-three.vercel.app/api"
+// const main = "http://localhost:3000/api"
+const main = "https://job-hunt-backend-beta.vercel.app/api"
 
 
 

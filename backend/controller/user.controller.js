@@ -64,7 +64,6 @@ export const Register = async (req, res) => {
   }
 };
 
-
 export const Login = async (req, res) => {
   try {
     const { email, password, role } = req.body;
@@ -115,10 +114,10 @@ export const Login = async (req, res) => {
     return res
       .status(200)
       .cookie("token", token, {
-        maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day
         httpOnly: true,
-        sameSite: "strict",
-        // secure: false,
+        secure: true, // REQUIRED for HTTPS
+        sameSite: "none", // REQUIRED for cross-origin
+        maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day
       })
       .json({
         message: `Welcome back ${user.fullname}`,
@@ -160,7 +159,9 @@ export const Updateprofile = async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(400).json({ message: "User not found", success: false });
+      return res
+        .status(400)
+        .json({ message: "User not found", success: false });
     }
 
     // Update fields

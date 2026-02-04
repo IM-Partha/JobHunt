@@ -1,15 +1,29 @@
 import mongoose from "mongoose";
-import dotenv from "dotenv";
-dotenv.config();
 
-const conectDB = async ()=>{
-    try{
-        await mongoose.connect(process.env.MONGOURL_URL)
-        console.log("mongoDb Connected")
-    }
-    catch(e){
-        console.log("conection lost", e)
-    }
+let cached = global.mongoose;
+
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
 }
 
-export default conectDB
+const connectDB = async () => {
+  if (cached.conn) {
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    cached.promise = mongoose
+      .connect(process.env.MONGOURL_URL, {
+        bufferCommands: false,
+      })
+      .then((mongoose) => {
+        console.log(" MongoDB connected");
+        return mongoose;
+      });
+  }
+
+  cached.conn = await cached.promise;
+  return cached.conn;
+};
+
+export default connectDB;
