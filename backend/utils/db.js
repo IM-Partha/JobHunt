@@ -17,12 +17,19 @@ const connectDB = async () => {
         bufferCommands: false,
       })
       .then((mongoose) => {
-        console.log(" MongoDB connected");
+        console.log("✅ MongoDB connected");
         return mongoose;
       });
   }
 
-  cached.conn = await cached.promise;
+  try {
+    cached.conn = await cached.promise;
+  } catch (err) {
+    cached.promise = null;
+    console.error("❌ MongoDB connection error:", err);
+    throw err;
+  }
+
   return cached.conn;
 };
 

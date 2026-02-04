@@ -22,7 +22,7 @@ const corsOptions = {
   credentials: true,
 };
 app.use(cors(corsOptions));
-
+await connectDB();
 // routes
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/company", comapnyRouter);
@@ -36,7 +36,7 @@ app.get("/", (req, res) => {
 });
 // server
 const PORT = process.env.PORT || 3000;
-connectDB();
+
 // app.listen(PORT, () => {
 //   connectDB();
 //   console.log(` Server running on port ${PORT}`);
