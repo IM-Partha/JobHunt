@@ -2,11 +2,11 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
-import connectDB from "./utils/db.js";
 import userRouter from "./routes/user.routes.js";
 import comapnyRouter from "./routes/company.route.js";
 import jobRouter from "./routes/job.route.js";
 import applicationRouter from "./routes/application.route.js";
+import conectDB from "./utils/db.js";
 
 dotenv.config();
 
@@ -22,7 +22,7 @@ const corsOptions = {
   credentials: true,
 };
 app.use(cors(corsOptions));
-await connectDB();
+await conectDB();
 // routes
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/company", comapnyRouter);
