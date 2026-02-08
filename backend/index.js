@@ -28,10 +28,15 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-  })
+  }),
 );
 
-app.options("*", cors());
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 await conectDB();
 // routes
@@ -48,8 +53,7 @@ app.get("/", (req, res) => {
 // server
 const PORT = process.env.PORT || 3000;
 
-// app.listen(PORT, () => {
-//   connectDB();
-//   console.log(` Server running on port ${PORT}`);
-// });
+app.listen(PORT, () => {
+  console.log(` Server running on port ${PORT}`);
+});
 export default app;
