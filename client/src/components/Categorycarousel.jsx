@@ -24,7 +24,7 @@ const Categorycarousel = () => {
   const navigate =useNavigate()
     function searchHandelar(query) {
       dispatch(setsearchquery(query));
-      navigate("/browse");
+      navigate("/jobs");
     }
   return (
     <section className="mt-15 px-4 sm:px-6">

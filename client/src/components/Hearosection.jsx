@@ -11,7 +11,7 @@ const Hearosection = () => {
   const navigate = useNavigate();
   function searchHandelar() {
     dispatch(setsearchquery(query));
-    navigate("/browse");
+    navigate("/jobs");
   }
   return (
     <section className="text-center mt-15 px-4">
