@@ -1,6 +1,6 @@
 
-// const main = "http://localhost:3000/api"
-const main = "https://job-hunt-backend-beta.vercel.app/api"
+const main = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+// const main = "https://job-hunt-backend-beta.vercel.app/api";
 
 
 
