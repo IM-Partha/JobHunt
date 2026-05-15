@@ -203,3 +203,47 @@ export const Updateprofile = async (req, res) => {
     });
   }
 };
+
+export const toggleSaveJob = async (req, res) => {
+  try {
+    const userId = req.id; // From auth middleware
+    const jobId = req.params.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized", success: false });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found", success: false });
+    }
+
+    const isSaved = user.profile.savedJobs.includes(jobId);
+
+    if (isSaved) {
+      // Unsave
+      user.profile.savedJobs = user.profile.savedJobs.filter(id => id.toString() !== jobId);
+      await user.save();
+      return res.status(200).json({
+        message: "Job removed from saved list",
+        success: true,
+        savedJobs: user.profile.savedJobs
+      });
+    } else {
+      // Save
+      user.profile.savedJobs.push(jobId);
+      await user.save();
+      return res.status(200).json({
+        message: "Job saved successfully",
+        success: true,
+        savedJobs: user.profile.savedJobs
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Server error",
+      success: false,
+    });
+  }
+};

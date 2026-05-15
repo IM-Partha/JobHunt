@@ -4,6 +4,11 @@ import { Bookmark } from "lucide-react";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { toast } from "sonner";
+import { Apiurl } from "@/urls/Apiurl";
+import { updateUserSavedJobs } from "@/redux/authSlice";
 const Job = ({ job }) => {
   const navigate = useNavigate();
   const daysAgoFound = (mongodbTime) => {
@@ -13,6 +18,28 @@ const Job = ({ job }) => {
     const current = new Date();
     const timeDiff = current - createdAt;
     return Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+  };
+
+  const dispatch = useDispatch();
+  const { user } = useSelector((store) => store.auth);
+  const isSaved = user?.profile?.savedJobs?.includes(job?._id);
+
+  const handleSaveJob = async () => {
+    if (!user) {
+      toast.error("Please login to save a job");
+      return;
+    }
+    try {
+      const res = await axios.post(`${Apiurl}/save-job/${job?._id}`, {}, {
+        withCredentials: true,
+      });
+      if (res.data.success) {
+        dispatch(updateUserSavedJobs(res.data.savedJobs));
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "An error occurred");
+    }
   };
 
   return (
@@ -25,8 +52,8 @@ const Job = ({ job }) => {
             : `${daysAgoFound(job?.createdAt)} days ago`}
         </p>
 
-        <Button variant="outline" className="rounded-full" size="icon">
-          <Bookmark className="w-4 h-4 cursor-pointer" />
+        <Button variant="outline" className={`rounded-full ${isSaved ? 'bg-gray-100' : ''}`} size="icon" onClick={handleSaveJob}>
+          <Bookmark className={`w-4 h-4 cursor-pointer ${isSaved ? 'fill-[#7209b7] text-[#7209b7]' : ''}`} />
         </Button>
       </div>
 
@@ -64,7 +91,12 @@ const Job = ({ job }) => {
         >
           Details
         </Button>
-        <Button className="cursor-pointer bg-[#7209b7]">Save for Later</Button>
+        <Button 
+          className={`cursor-pointer ${isSaved ? 'bg-gray-600' : 'bg-[#7209b7]'}`} 
+          onClick={handleSaveJob}
+        >
+          {isSaved ? "Saved" : "Save for Later"}
+        </Button>
       </div>
     </section>
   );

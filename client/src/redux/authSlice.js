@@ -13,10 +13,15 @@ const authSlice = createSlice({
         },
         setAuthUser:(state,action)=>{
             state.user = action.payload
+        },
+        updateUserSavedJobs:(state,action)=>{
+            if(state.user && state.user.profile) {
+                state.user.profile.savedJobs = action.payload;
+            }
         }
      }
 })
 
 
-export const {setLoading, setAuthUser} = authSlice.actions
+export const {setLoading, setAuthUser, updateUserSavedJobs} = authSlice.actions
 export default authSlice.reducer
