@@ -38,7 +38,7 @@ app.use((req, res, next) => {
   next();
 });
 
-await conectDB();
+conectDB();
 // routes
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/company", comapnyRouter);
