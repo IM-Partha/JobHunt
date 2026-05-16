@@ -61,7 +61,7 @@ export const Register = async (req, res) => {
     await sendEmail({
       email,
       subject: "Verify your Email",
-      html: `<h2>Welcome to JobPortal!</h2><p>Your verification code is: <strong style="font-size: 24px;">${verificationCode}</strong></p><p>This code expires in 24 hours.</p>`
+      html: `<h2>Welcome to Job Hunt!</h2><p>Your verification code is: <strong style="font-size: 24px;">${verificationCode}</strong></p><p>This code expires in 24 hours.</p>`
     });
 
     return res.status(201).json({

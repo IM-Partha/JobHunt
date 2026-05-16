@@ -37,7 +37,7 @@ const Navbar = () => {
         {/* Logo */}
         <div>
           <h1 className="text-2xl font-bold">
-            Job<span className="text-[#F83002]">Portal</span>
+            Job <span className="text-[#F83002]">Hunt</span>
           </h1>
         </div>
 
