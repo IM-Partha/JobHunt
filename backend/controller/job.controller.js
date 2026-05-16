@@ -1,40 +1,46 @@
 import { Job } from "../models/job.model.js"
 
 
-export const postJob = async(req,res)=>{
+export const postJob = async (req, res) => {
     try {
-        const {title, description, requirements,  salary, location, jobType, experience, position , companyId} = req.body
+        const { title, description, requirements, salary, location, jobType, experience, position, companyId } = req.body;
         
-        const userId = req.id 
-        if(!title || !description || !requirements || salary === undefined || salary === null || !location || !jobType || !experience || position === undefined || position === null || !companyId){
+        const userId = req.id;
+        
+        if (!title || !description || !requirements || !location || !jobType || !experience || !companyId || salary === "" || salary === undefined || position === "" || position === undefined) {
             return res.status(400).json({
-                message:"Something is missing. Please fill all fields.",
-                success:false
-            })
+                message: "Something is missing. Please fill all fields.",
+                success: false
+            });
         }
 
         const job = await Job.create({
             title,
             description,
-            requirements:  requirements.split(","),
-            salary:salary || 0,
+            requirements: requirements.split(","),
+            salary: Number(salary) || 0,
             location,
             jobType,
             experienceLevel: experience,
-            position,
-            company:companyId,
-            created_by:userId
+            position: Number(position) || 0,
+            company: companyId,
+            created_by: userId
+        });
 
-        })
         return res.status(201).json({
-            message:"New Job Created successfully",
+            message: "New Job Created successfully",
             job,
-            success:true
-        })
+            success: true
+        });
     } catch (error) {
-        console.log(error)
+        console.error(error);
+        return res.status(500).json({
+            message: "Internal server error.",
+            success: false,
+            error: error.message
+        });
     }
-}   
+}
 
 
 export const getAlljob = async (req,res)=>{
@@ -60,7 +66,12 @@ export const getAlljob = async (req,res)=>{
         success:true
     })
     } catch (error) {
-        console.log(error)
+        console.error(error);
+        return res.status(500).json({
+            message: "Internal server error.",
+            success: false,
+            error: error.message
+        });
     }
 }
 
@@ -82,7 +93,12 @@ export const getJobById= async(req,res)=>{
             success:true
         })
     } catch (error) {
-        console.log(error)
+        console.error(error);
+        return res.status(500).json({
+            message: "Internal server error.",
+            success: false,
+            error: error.message
+        });
     }
 }
 
@@ -105,6 +121,11 @@ export const getAdminJob = async (req,res)=>{
         success:true
     })
     } catch (error) {
-        console.log(error)
+        console.error(error);
+        return res.status(500).json({
+            message: "Internal server error.",
+            success: false,
+            error: error.message
+        });
     }
 }
