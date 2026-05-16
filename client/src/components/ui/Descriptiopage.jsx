@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Badge } from "./badge";
 import { Button } from "./button";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Apiapplication, ApiJob } from "@/urls/Apiurl";
 import { setSinglejob } from "@/redux/jobSlice";
@@ -13,6 +13,7 @@ const Descriptiopage = () => {
   const { user } = useSelector((store) => store.auth);
   const { singlejob } = useSelector((store) => store.job);
   const params = useParams();
+  const navigate = useNavigate();
   const jobId = params.id;
 
   const [isApplied, setIsApplied] = useState(false);
@@ -41,6 +42,12 @@ const Descriptiopage = () => {
 
   // ✅ Apply Job
   const applyJobHandler = async () => {
+    if (!user) {
+      toast.error("Please login to apply for this job");
+      navigate("/login");
+      return;
+    }
+    
     try {
       const res = await axios.get(`${Apiapplication}/apply/${jobId}`, {
         withCredentials: true,
