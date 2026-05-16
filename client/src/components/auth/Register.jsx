@@ -50,8 +50,8 @@ async function handleSubmit(e) {
     });
 
     if(res.data.success){
-      navigate('/login')
       toast.success(res.data.message)
+      navigate('/verify-email', { state: { email: info.email } })
     }
   } catch (error) {
     toast.error(error.response.data.message)

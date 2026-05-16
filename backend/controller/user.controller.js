@@ -3,11 +3,11 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import getDatauri from "../utils/datauri.js";
 import cloudinary from "../utils/cloudinary.js";
+import { sendEmail } from "../utils/sendEmail.js";
 
 export const Register = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, password, role } = req.body;
-    console.log(fullname, email, phoneNumber, password, role);
 
     // Validation check
     if (!fullname || !email || !phoneNumber || !password || !role) {
@@ -39,6 +39,9 @@ export const Register = async (req, res) => {
       profilePhotoUrl = cloudResponse.secure_url;
     }
 
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digit code
+    const verificationTokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
     // Create new user
     await User.create({
       fullname,
@@ -49,10 +52,20 @@ export const Register = async (req, res) => {
       profile: {
         profilePhoto: profilePhotoUrl, // could be empty if no upload
       },
+      verificationToken: verificationCode,
+      verificationTokenExpiresAt,
+      isVerified: false
+    });
+
+    // Send email
+    await sendEmail({
+      email,
+      subject: "Verify your Email",
+      html: `<h2>Welcome to JobPortal!</h2><p>Your verification code is: <strong style="font-size: 24px;">${verificationCode}</strong></p><p>This code expires in 24 hours.</p>`
     });
 
     return res.status(201).json({
-      message: "User registered successfully",
+      message: "User registered successfully. Please check your email for the verification code.",
       success: true,
     });
   } catch (error) {
@@ -79,6 +92,14 @@ export const Login = async (req, res) => {
       return res.status(400).json({
         message: "Incorrect email or password",
         success: false,
+      });
+    }
+
+    if (!user.isVerified) {
+      return res.status(400).json({
+        message: "Please verify your email before logging in.",
+        success: false,
+        notVerified: true
       });
     }
 
@@ -245,5 +266,85 @@ export const toggleSaveJob = async (req, res) => {
       message: "Server error",
       success: false,
     });
+  }
+};
+
+export const VerifyEmail = async (req, res) => {
+  try {
+    const { email, code } = req.body;
+    if (!email || !code) {
+      return res.status(400).json({ message: "Email and code are required", success: false });
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found", success: false });
+    }
+    if (user.isVerified) {
+      return res.status(400).json({ message: "User already verified", success: false });
+    }
+    if (user.verificationToken !== code || user.verificationTokenExpiresAt < new Date()) {
+      return res.status(400).json({ message: "Invalid or expired verification code", success: false });
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpiresAt = undefined;
+    await user.save();
+
+    return res.status(200).json({ message: "Email verified successfully", success: true });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error", success: false });
+  }
+};
+
+export const ForgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: "Email is required", success: false });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: "User not found", success: false });
+
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    user.resetPasswordToken = resetCode;
+    user.resetPasswordExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
+    await user.save();
+
+    await sendEmail({
+      email,
+      subject: "Password Reset Code",
+      html: `<p>Your password reset code is: <strong style="font-size: 24px;">${resetCode}</strong></p><p>This code expires in 15 minutes.</p>`
+    });
+
+    return res.status(200).json({ message: "Password reset code sent to your email", success: true });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error", success: false });
+  }
+};
+
+export const ResetPassword = async (req, res) => {
+  try {
+    const { email, code, newPassword } = req.body;
+    if (!email || !code || !newPassword) return res.status(400).json({ message: "All fields are required", success: false });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: "User not found", success: false });
+
+    if (user.resetPasswordToken !== code || user.resetPasswordExpiresAt < new Date()) {
+      return res.status(400).json({ message: "Invalid or expired reset code", success: false });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpiresAt = undefined;
+    await user.save();
+
+    return res.status(200).json({ message: "Password reset successfully", success: true });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error", success: false });
   }
 };

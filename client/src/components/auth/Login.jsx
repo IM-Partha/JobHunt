@@ -46,6 +46,9 @@ const Login = () => {
       }
     } catch (error) {
       toast.error(error.response.data.message);
+      if (error.response?.data?.notVerified) {
+        navigate('/verify-email', { state: { email: info.email } });
+      }
     } finally {
       dispatch(setLoading(false));
     }
@@ -138,6 +141,11 @@ const Login = () => {
             don't have an account ?{" "}
             <Link to="/register" className="text-blue-600 mt-5">
               Register
+            </Link>
+          </span>
+          <span className="w-full text-center mt-2">
+            <Link to="/forgot-password" className="text-blue-600">
+              Forgot Password?
             </Link>
           </span>
         </div>

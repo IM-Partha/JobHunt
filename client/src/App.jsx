@@ -4,6 +4,9 @@ import Navbar from "./components/shared/Navbar";
 import Footer from "./components/shared/Footer";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
+import VerifyEmail from "./components/auth/VerifyEmail";
+import ForgotPassword from "./components/auth/ForgotPassword";
+import ResetPassword from "./components/auth/ResetPassword";
 import Home from "./components/Home";
 import Jobs from "./components/Jobs";
 import Browser from "./components/Browser";
@@ -29,6 +32,9 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/browse" element={<Browser />} />
         <Route path="/profile" element={<Profile />} />
